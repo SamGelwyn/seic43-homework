@@ -1,7 +1,7 @@
 const searchFlickr = function (keywords) {
 
-  if (state.lastPageReached) {
-    return; // Get out.
+  if (state.lastPage) {
+    return; // Bail out.
   }
 
   console.log('searching for', keywords);
@@ -15,18 +15,18 @@ const searchFlickr = function (keywords) {
     page: state.nextPage++
   }).done(showImages).done(function (info) {
     if (info.photos.page >= info.photos.pages) {
-      state.lastPageReached = true;
+      state.lastPage = true;
     }
     console.log(info);
     console.log(state);
   });
 };
 
-const throttledSearchFlickr = _.throttle(searchFlickr,1000, {trailing: false})
+const throttledSearchFlickr = _.throttle(searchFlickr,2000, {trailing: false})
 
 const state = {
   nextPage: 1,
-  lastPageReached: false
+  lastPage: false
 };
 
 const showImages = function (results) {
@@ -58,6 +58,7 @@ $(document).ready(function () {
     event.preventDefault();
 
     state.nextPage = 1;
+    state.lastPage = false;
     $('#images').empty();
 
     const searchTerms = $('#query').val();
@@ -72,7 +73,7 @@ $(document).ready(function () {
     // if the scroll bottom < 400px searchFlickr again
     if (scrollBottom < 400) {
       const searchTerms = $('#query').val();
-      throttledSearchFlickr(searchTerms); // page 1 again: HW: get the next page
+      throttledSearchFlickr(searchTerms);
     }
 
   });
